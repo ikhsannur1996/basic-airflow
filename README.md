@@ -4,6 +4,7 @@
 Apache Airflow is an open-source platform used to programmatically author, schedule, and monitor workflows. Directed Acyclic Graphs (DAGs) in Airflow are the core component that represents a workflow.
 
 ### 1. Simple DAG to Print Hello World
+**Description**: This DAG is a straightforward example demonstrating the basic structure of an Airflow DAG. It consists of a single task called `print_hello`, which executes a Python function to print "Hello World!". The DAG is scheduled to run daily starting from January 1, 2024. It's a simple yet essential example to understand the DAG's anatomy and scheduling capabilities.
 ```python
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
@@ -23,9 +24,10 @@ task_hello = PythonOperator(
     dag=dag
 )
 ```
-**Description**: This DAG consists of a single task that prints "Hello World!" daily starting from January 1, 2024.
 
 ### 2. DAG with Multiple Tasks
+**Description**: In this DAG, we introduce multiple tasks connected sequentially. It starts with a dummy task called `start`, followed by a Python task named `print_hello`, which prints "Hello World!". Finally, it ends with another dummy task named `end`. This DAG runs hourly starting from January 1, 2024. It demonstrates how to define dependencies between tasks in a workflow.
+
 ```python
 from airflow import DAG
 from airflow.operators.dummy_operator import DummyOperator
@@ -46,9 +48,11 @@ task_end = DummyOperator(task_id='end', dag=dag)
 
 task_start >> task_hello >> task_end
 ```
-**Description**: This DAG consists of three tasks: start, print_hello, and end. It runs hourly starting from January 1, 2024. The print_hello task prints "Hello World!".
 
 ### 3. Conditional Execution DAG
+
+**Description**: This DAG showcases conditional execution based on a branching condition. The `decide_branch` task decides whether to execute the `morning_task` or `afternoon_task` based on the current time. If the current time is before 12 PM, it executes the morning task; otherwise, it executes the afternoon task. This demonstrates Airflow's ability to handle branching logic within workflows.
+
 ```python
 from airflow import DAG
 from airflow.operators.python_operator import BranchPythonOperator, PythonOperator
@@ -94,6 +98,8 @@ task_decide >> [task_morning, task_afternoon]
 **Description**: This DAG decides whether to execute the morning_task or afternoon_task based on the current time. It runs daily starting from January 1, 2024.
 
 ### 4. Parameterized DAG
+**Description**: Here, we introduce a parameterized DAG where the task `print_message` accepts a parameter (`message`) and prints it. This enables dynamic behavior within tasks, allowing you to pass parameters and customize task execution based on external factors. The DAG runs daily starting from January 1, 2024, showcasing how to incorporate dynamic data into your workflows.
+
 ```python
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
@@ -114,9 +120,9 @@ task_print = PythonOperator(
     dag=dag
 )
 ```
-**Description**: This DAG prints a parameterized message. It runs daily starting from January 1, 2024.
-
 ### 5. Error Handling DAG
+**Description**: This DAG focuses on error handling within workflows. The `error_task` intentionally raises an exception to simulate an error. The `error_callback` task serves as an error handler and is triggered only if the `error_task` fails. It demonstrates how to implement error handling strategies within Airflow DAGs, ensuring robustness and reliability in your workflow executions.
+
 ```python
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
@@ -153,3 +159,188 @@ task_error >> task_error_handler
 
 ### Conclusion
 These examples provide a basic understanding of how to create Airflow DAGs using dummy data. With Airflow's flexibility, you can build complex workflows to automate and manage your data pipelines effectively.
+
+
+
+Certainly! Below is the complete README.md document containing information about all the DAGs:
+
+```markdown
+# Airflow Sample DAGs
+
+This repository contains sample DAGs for Apache Airflow, demonstrating different scheduling intervals and error handling.
+
+## DAGs
+
+1. **Hourly DAG**: Executes a task every hour.
+2. **Daily DAG**: Executes a task once every day.
+3. **Monthly DAG**: Executes a task once every month.
+4. **Specific Hour in a Day DAG**: Executes a task at a specific hour of the day.
+5. **Specific Day of Month DAG**: Executes a task on a specific day of the month.
+6. **Error Handling DAG**: Executes an error handling task when any task in the DAG fails.
+
+## Hourly DAG (`hourly_dag.py`)
+
+```python
+from airflow import DAG
+from airflow.operators.dummy_operator import DummyOperator
+from datetime import datetime, timedelta
+
+default_args = {
+    'owner': 'airflow',
+    'depends_on_past': False,
+    'start_date': datetime(2024, 5, 6),
+    'email_on_failure': False,
+    'email_on_retry': False,
+    'retries': 1,
+    'retry_delay': timedelta(minutes=5),
+}
+
+with DAG(
+    'hourly_dag',
+    default_args=default_args,
+    description='Execute a task every hour',
+    schedule_interval='@hourly',
+) as dag:
+
+    start_task = DummyOperator(task_id='start_task')
+    hourly_task = DummyOperator(task_id='hourly_task')
+    end_task = DummyOperator(task_id='end_task')
+
+    start_task >> hourly_task >> end_task
+```
+
+## Daily DAG (`daily_dag.py`)
+
+```python
+from airflow import DAG
+from airflow.operators.dummy_operator import DummyOperator
+from datetime import datetime, timedelta
+
+default_args = {
+    'owner': 'airflow',
+    'depends_on_past': False,
+    'start_date': datetime(2024, 5, 6),
+    'email_on_failure': False,
+    'email_on_retry': False,
+    'retries': 1,
+    'retry_delay': timedelta(minutes=5),
+}
+
+with DAG(
+    'daily_dag',
+    default_args=default_args,
+    description='Execute a task once every day',
+    schedule_interval='@daily',
+) as dag:
+
+    start_task = DummyOperator(task_id='start_task')
+    daily_task = DummyOperator(task_id='daily_task')
+    end_task = DummyOperator(task_id='end_task')
+
+    start_task >> daily_task >> end_task
+```
+
+## Specific Hour in a Day DAG (`specific_hour_dag.py`)
+
+```python
+from airflow import DAG
+from airflow.operators.dummy_operator import DummyOperator
+from datetime import datetime, timedelta
+
+default_args = {
+    'owner': 'airflow',
+    'depends_on_past': False,
+    'start_date': datetime(2024, 5, 6),
+    'email_on_failure': False,
+    'email_on_retry': False,
+    'retries': 1,
+    'retry_delay': timedelta(minutes=5),
+}
+
+with DAG(
+    'specific_hour_dag',
+    default_args=default_args,
+    description='Execute a task at a specific hour of the day',
+    schedule_interval='0 12 * * *',  # Execute at 12:00 PM UTC every day
+) as dag:
+
+    start_task = DummyOperator(task_id='start_task')
+    specific_hour_task = DummyOperator(task_id='specific_hour_task')
+    end_task = DummyOperator(task_id='end_task')
+
+    start_task >> specific_hour_task >> end_task
+```
+
+## Specific Day of Month DAG (`specific_day_month_dag.py`)
+
+```python
+from airflow import DAG
+from airflow.operators.dummy_operator import DummyOperator
+from datetime import datetime, timedelta
+
+default_args = {
+    'owner': 'airflow',
+    'depends_on_past': False,
+    'start_date': datetime(2024, 5, 6),
+    'email_on_failure': False,
+    'email_on_retry': False,
+    'retries': 1,
+    'retry_delay': timedelta(minutes=5),
+}
+
+with DAG(
+    'specific_day_month_dag',
+    default_args=default_args,
+    description='Execute a task on a specific day of the month',
+    schedule_interval='0 0 15 * *',  # Execute at midnight (UTC) on the 15th day of every month
+) as dag:
+
+    start_task = DummyOperator(task_id='start_task')
+    specific_day_task = DummyOperator(task_id='specific_day_task')
+    end_task = DummyOperator(task_id='end_task')
+
+    start_task >> specific_day_task >> end_task
+```
+
+## Error Handling DAG (`error_handling_dag.py`)
+
+```python
+from airflow import DAG
+from airflow.operators.dummy_operator import DummyOperator
+from airflow.operators.python_operator import PythonOperator
+from datetime import datetime, timedelta
+
+default_args = {
+    'owner': 'airflow',
+    'depends_on_past': False,
+    'start_date': datetime(2024, 5, 6),
+    'email_on_failure': False,
+    'email_on_retry': False,
+    'retries': 1,
+    'retry_delay': timedelta(minutes=5),
+}
+
+def error_handler_task():
+    print("This task handles errors")
+
+with DAG(
+    'error_handling_dag',
+    default_args=default_args,
+    description='Execute an error handling task when any task in the DAG fails',
+    schedule_interval=None,
+) as dag:
+
+    start_task = DummyOperator(task_id='start_task')
+    error_handler_task = PythonOperator(
+        task_id='error_handler_task',
+        python_callable=error_handler_task,
+    )
+    end_task = DummyOperator(task_id='end_task')
+
+    start_task >> error_handler_task >> end_task
+```
+
+This README provides details about each DAG along with the corresponding Python script for each DAG.
+```
+
+This README provides a clear overview of each DAG along with the necessary details and code snippets. Let me know if you need further assistance!
