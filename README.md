@@ -162,9 +162,6 @@ These examples provide a basic understanding of how to create Airflow DAGs using
 
 
 
-Certainly! Below is the complete README.md document containing information about all the DAGs:
-
-```markdown
 # Airflow Sample DAGs
 
 This repository contains sample DAGs for Apache Airflow, demonstrating different scheduling intervals and error handling.
