@@ -92,7 +92,6 @@ In this complete DAG:
 - `catchup` is set to `False` to disable backfilling of past DAG runs.
 - Tags `['example', 'tag']` are added to the DAG for categorization.
 - The DAG consists of three tasks: `start`, `print_hello`, and `end`, along with their dependencies defined accordingly.
-- Certainly! Here's the description for each default argument used in the DAG:
 - `'owner'`: The owner of the DAG and tasks. It is typically a username or team name responsible for maintaining the DAG.
 - `'email'`: The email address to which notifications, including task failure alerts, are sent.
 - `'retries'`: The number of retries for failed tasks. If a task fails execution, Airflow will attempt to rerun it up to the specified number of retries before marking it as failed.
