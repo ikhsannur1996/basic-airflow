@@ -345,3 +345,123 @@ The scheduler DAGs provided in this repository offer a comprehensive overview of
 With the flexibility and power of Apache Airflow, users can tailor these examples to suit their specific use cases, enabling seamless automation and orchestration of complex workflows. Whether it's executing tasks at specific time intervals, handling errors gracefully, or customizing task dependencies, Airflow provides a robust framework for building scalable and resilient data pipelines.
 
 Explore these scheduler DAGs, experiment with different configurations, and leverage Airflow's capabilities to streamline your data engineering workflows.
+
+
+# Tutorial: Checking PostgreSQL Connection Using a Saved Connection
+
+**Code Example:**
+```python
+from airflow import DAG
+from airflow.operators.python_operator import PythonOperator
+from airflow.utils.dates import days_ago
+from airflow.hooks.postgres_hook import PostgresHook
+
+default_args = {
+    'owner': 'airflow',
+    'depends_on_past': False,
+    'start_date': days_ago(1),
+    'email_on_failure': False,
+    'email_on_retry': False,
+    'retries': 1,
+}
+
+dag = DAG(
+    'postgres_connection_check_saved_connection',
+    default_args=default_args,
+    description='A DAG to check PostgreSQL connection using a saved connection',
+    schedule_interval=None,
+    tags=['postgres', 'connection', 'check']
+)
+
+def check_postgres_connection():
+    try:
+        # Initialize PostgresHook with the saved connection ID
+        postgres_hook = PostgresHook(postgres_conn_id='akad')
+        
+        # Get a connection to the PostgreSQL database
+        conn = postgres_hook.get_conn()
+        
+        # Execute a simple query to check the connection
+        cursor = conn.cursor()
+        cursor.execute("SELECT 1")
+        result = cursor.fetchone()
+        
+        print("Connection to PostgreSQL successful. Result:", result)
+        
+        # Close connections
+        cursor.close()
+        conn.close()
+        
+    except Exception as e:
+        print("Error connecting to PostgreSQL:", e)
+
+check_postgres_connection_task = PythonOperator(
+    task_id='check_postgres_connection',
+    python_callable=check_postgres_connection,
+    dag=dag,
+)
+
+check_postgres_connection_task
+```
+
+### Tutorial: Checking PostgreSQL Connection Using Manual Connection Details
+
+**Code Example:**
+```python
+from airflow import DAG
+from airflow.operators.python_operator import PythonOperator
+from airflow.utils.dates import days_ago
+import psycopg2
+
+default_args = {
+    'owner': 'airflow',
+    'depends_on_past': False,
+    'start_date': days_ago(1),
+    'email_on_failure': False,
+    'email_on_retry': False,
+    'retries': 1,
+}
+
+dag = DAG(
+    'postgres_connection_check_manual_connection',
+    default_args=default_args,
+    description='A DAG to check PostgreSQL connection using manual connection details',
+    schedule_interval=None,
+    tags=['postgres', 'connection', 'check']
+)
+
+def check_postgres_connection():
+    try:
+        # Establish connection
+        conn = psycopg2.connect(
+            host="your_host",
+            port="your_port",
+            database="your_database",
+            user="your_username",
+            password="your_password"
+        )
+        
+        # Execute a simple query to check the connection
+        cursor = conn.cursor()
+        cursor.execute("SELECT 1")
+        result = cursor.fetchone()
+        
+        print("Connection to PostgreSQL successful. Result:", result)
+        
+        # Close connections
+        cursor.close()
+        conn.close()
+        
+    except Exception as e:
+        print("Error connecting to PostgreSQL:", e)
+
+check_postgres_connection_task = PythonOperator(
+    task_id='check_postgres_connection',
+    python_callable=check_postgres_connection,
+    dag=dag,
+)
+
+check_postgres_connection_task
+```
+
+These code examples provide the necessary setup and task definition to check the PostgreSQL connection using both a saved connection and manual connection details in Apache Airflow.
