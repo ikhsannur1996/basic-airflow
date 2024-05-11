@@ -8,7 +8,7 @@ Apache Airflow is an open-source platform used to programmatically author, sched
 ### 1. Simple DAG to Print Hello World
 **Description**: This DAG is a straightforward example demonstrating the basic structure of an Airflow DAG. It consists of a single task called `print_hello`, which executes a Python function to print "Hello World!". The DAG is scheduled to run daily starting from January 1, 2024. It's a simple yet essential example to understand the DAG's anatomy and scheduling capabilities.
 
-**Sampmple 1:**
+**Sample 1:**
 ```python
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
@@ -40,6 +40,21 @@ from datetime import datetime
 # Define a Python function to print "Hello, World!"
 def print_hello():
     print("Hello, World!")
+
+# Default arguments
+    default_args={
+    'owner': 'airflow', 
+    'email': 'airflow@example.com', 
+    'retries': 3,  # Number of retries for failed tasks
+    'retry_delay': timedelta(minutes=5),  # Delay between retries
+    'depends_on_past': False,  # Set to True to consider past runs when determining if a DAG should be triggered
+    'wait_for_downstream': False,  # Set to True to wait for all immediate downstream tasks to finish before marking the current task as complete
+    'email_on_failure': True,  # Set to False to disable email notifications on task failure
+    'email_on_retry': True,  # Set to False to disable email notifications on task retries
+    'execution_timeout': timedelta(hours=1),  # Time limit for task execution
+    'sla': timedelta(hours=2)  # Service Level Agreement for task execution
+}
+
 
 # Define the DAG
 dag = DAG(
@@ -77,7 +92,17 @@ In this complete DAG:
 - `catchup` is set to `False` to disable backfilling of past DAG runs.
 - Tags `['example', 'tag']` are added to the DAG for categorization.
 - The DAG consists of three tasks: `start`, `print_hello`, and `end`, along with their dependencies defined accordingly.
-
+- Certainly! Here's the description for each default argument used in the DAG:
+- `'owner'`: The owner of the DAG and tasks. It is typically a username or team name responsible for maintaining the DAG.
+- `'email'`: The email address to which notifications, including task failure alerts, are sent.
+- `'retries'`: The number of retries for failed tasks. If a task fails execution, Airflow will attempt to rerun it up to the specified number of retries before marking it as failed.
+- `'retry_delay'`: The delay between retries for failed tasks. After a task fails, Airflow will wait for this duration before attempting to rerun it.
+- `'depends_on_past'`: Determines whether a task's execution depends on the success of its previous run. If set to `True`, the task will only execute if its previous run succeeded.
+- `'wait_for_downstream'`: Determines whether a task should wait for all immediate downstream tasks to finish before marking itself as complete. If set to `True`, the task will wait for its downstream tasks to finish before proceeding.
+- `'email_on_failure'`: Specifies whether to send email notifications when a task fails. If set to `True`, email notifications will be sent upon task failure.
+- `'email_on_retry'`: Specifies whether to send email notifications when a task is retried. If set to `True`, email notifications will be sent upon task retries.
+- `'execution_timeout'`: The maximum time allowed for the execution of a task. If a task exceeds this time limit, it will be marked as failed.
+- `'sla'`: The Service Level Agreement (SLA) for task execution. This defines the maximum time allowed for a task to complete successfully. If a task exceeds this SLA, it will be marked as missed.
 
 ### 2. DAG with Multiple Tasks
 **Description**: In this DAG, we introduce multiple tasks connected sequentially. It starts with a dummy task called `start`, followed by a Python task named `print_hello`, which prints "Hello World!". Finally, it ends with another dummy task named `end`. This DAG runs hourly starting from January 1, 2024. It demonstrates how to define dependencies between tasks in a workflow.
