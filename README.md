@@ -7,6 +7,8 @@ Apache Airflow is an open-source platform used to programmatically author, sched
 
 ### 1. Simple DAG to Print Hello World
 **Description**: This DAG is a straightforward example demonstrating the basic structure of an Airflow DAG. It consists of a single task called `print_hello`, which executes a Python function to print "Hello World!". The DAG is scheduled to run daily starting from January 1, 2024. It's a simple yet essential example to understand the DAG's anatomy and scheduling capabilities.
+
+**Sampmple 1:**
 ```python
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
@@ -26,6 +28,56 @@ task_hello = PythonOperator(
     dag=dag
 )
 ```
+
+**Sample 2:**
+
+```python
+from airflow import DAG
+from airflow.operators.dummy_operator import DummyOperator
+from airflow.operators.python_operator import PythonOperator
+from datetime import datetime
+
+# Define a Python function to print "Hello, World!"
+def print_hello():
+    print("Hello, World!")
+
+# Define the DAG
+dag = DAG(
+    dag_id='my_dag',
+    description='My DAG Description',
+    schedule_interval='@daily',
+    start_date=datetime(2022, 1, 1),
+    end_date=datetime(2022, 1, 31),  # Optional end date
+    default_args={'owner': 'airflow', 'email': 'airflow@example.com'},  # Default arguments
+    catchup=False,  # Disable backfilling
+    tags=['example', 'tag']  # Tags for categorization
+)
+
+# Define tasks
+start_task = DummyOperator(task_id='start', dag=dag)
+
+hello_task = PythonOperator(
+    task_id='print_hello',
+    python_callable=print_hello,
+    dag=dag
+)
+
+end_task = DummyOperator(task_id='end', dag=dag)
+
+# Define task dependencies
+start_task >> hello_task >> end_task
+```
+
+In this complete DAG:
+
+- The DAG is identified by the `dag_id` parameter `'my_dag'`.
+- The `description` parameter provides a brief description of the DAG.
+- It is scheduled to run daily (`'@daily'`) starting from January 1, 2022, with an optional end date of January 31, 2022.
+- The `default_args` parameter defines default parameters for tasks, including the `'owner'` and `'email'`.
+- `catchup` is set to `False` to disable backfilling of past DAG runs.
+- Tags `['example', 'tag']` are added to the DAG for categorization.
+- The DAG consists of three tasks: `start`, `print_hello`, and `end`, along with their dependencies defined accordingly.
+
 
 ### 2. DAG with Multiple Tasks
 **Description**: In this DAG, we introduce multiple tasks connected sequentially. It starts with a dummy task called `start`, followed by a Python task named `print_hello`, which prints "Hello World!". Finally, it ends with another dummy task named `end`. This DAG runs hourly starting from January 1, 2024. It demonstrates how to define dependencies between tasks in a workflow.
