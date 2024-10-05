@@ -20,7 +20,8 @@ def print_hello():
 dag = DAG('hello_world', description='Simple DAG to print Hello World',
           schedule_interval='@daily',
           start_date=datetime(2024, 1, 1),
-          catchup=False)
+          catchup=False,
+          tags=['example', 'tag'] )
 
 task_hello = PythonOperator(
     task_id='print_hello',
