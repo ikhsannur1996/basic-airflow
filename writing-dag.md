@@ -69,4 +69,3 @@ with DAG(
 ## Conclusion
 
 Both methods achieve the same outcome but offer flexibility depending on your coding style or specific requirements in your Airflow setup. Choose the method that best fits your needs!
-```
