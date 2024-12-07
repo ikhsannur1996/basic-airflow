@@ -1,7 +1,13 @@
-
 # Creating a DAG in Apache Airflow
 
-In Apache Airflow, you can define a Directed Acyclic Graph (DAG) using different syntactical approaches. This document outlines two common methods: using the DAG constructor and using a context manager.
+Apache Airflow is an open-source platform used to programmatically author, schedule, and monitor workflows. In Airflow, workflows are defined as Directed Acyclic Graphs (DAGs). This document outlines three common methods for creating DAGs: using the DAG constructor, using a context manager, and using the `@dag` decorator.
+
+## Table of Contents
+
+- [Method 1: Using the DAG Constructor](#method-1-using-the-dag-constructor)
+- [Method 2: Using the Context Manager](#method-2-using-the-context-manager)
+- [Method 3: Using the @dag Decorator](#method-3-using-the-dag-decorator)
+- [Conclusion](#conclusion)
 
 ## Method 1: Using the DAG Constructor
 
@@ -35,7 +41,7 @@ start_task >> end_task
 - **Task Definition**: Tasks are created using operators (e.g., `DummyOperator`).
 - **Task Dependencies**: The `>>` operator sets the order of task execution.
 
-## Method 2: Using the Context Manager (`with` statement)
+## Method 2: Using the Context Manager
 
 Another way to define a DAG is by using a context manager, which automatically associates tasks defined within its block to the DAG.
 
@@ -66,6 +72,48 @@ with DAG(
 - **Context Manager**: The `with` statement creates a context in which any tasks defined are automatically added to the specified DAG.
 - **Task Definition and Dependencies**: Tasks are defined similarly to the first method but without needing to pass the `dag` parameter explicitly.
 
+## Method 3: Using the @dag Decorator
+
+Introduced in Airflow 2.0, this method allows you to define a DAG using a decorator, which can enhance readability and organization.
+
+### Example
+
+```python
+from airflow.decorators import dag, task
+from datetime import datetime
+
+@dag(
+    schedule_interval='@daily',
+    start_date=datetime(2023, 1, 1),
+    catchup=False,
+)
+def my_decorated_dag():
+    
+    @task
+    def start():
+        print("Starting...")
+
+    @task
+    def end():
+        print("Ending...")
+
+    start_task = start()
+    end_task = end()
+
+    start_task >> end_task
+
+# Instantiate the DAG
+dag_instance = my_decorated_dag()
+```
+
+### Explanation
+
+- **Decorator Usage**: The `@dag` decorator is applied to a function that defines the workflow.
+- **Task Definition**: Each task is defined with the `@task` decorator, promoting cleaner syntax.
+- **Task Dependencies**: Dependencies are set using standard Python function calls.
+
 ## Conclusion
 
-Both methods achieve the same outcome but offer flexibility depending on your coding style or specific requirements in your Airflow setup. Choose the method that best fits your needs!
+Each method for creating a DAG in Apache Airflow has its advantages. The constructor method provides explicit control over task creation and dependencies, while the context manager simplifies syntax. The `@dag` decorator enhances readability and encapsulates logic within functions. Choose the method that best fits your coding style and project requirements.
+
+For more information on Apache Airflow, visit [Apache Airflow Documentation](https://airflow.apache.org/docs/).
